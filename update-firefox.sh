@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.2
+# Version 0.3
 # Charlie Callow 2017
 
 # Config
@@ -11,6 +11,22 @@ app_name[0]="Firefox"
 app_path[0]=apps/firefox
 app_name[1]="Firefox-ESR"
 app_path[1]=apps/firefox-esr
+
+# Intro
+clear
+echo "-----------------------"
+echo "---MUNKI APP UPDATER---"
+echo "------Version 0.3------"
+echo "--Charlie Callow 2017--"
+echo "-----------------------"
+echo ""
+echo "Apps to update:"
+for ((i=0; i<${#app_name[*]}; i++));
+do
+	echo "${app_name[i]}"
+done
+echo ""
+
 
 # Checks version of app in Munki repo
 check_version() {
