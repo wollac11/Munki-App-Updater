@@ -7,8 +7,11 @@
 
 # Config
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
+download_path="./DMGs"
+
 app_name[0]="Firefox"
 app_path[0]="apps/firefox"
+app_url[0]="https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-GB"
 app_name[1]="Firefox-ESR"
 app_path[1]="apps/firefox-esr"
 
@@ -102,24 +105,24 @@ prep_Firefox-ESR() {
 
 	# Make writable copy of DMG
 	echo "Making writeable image"
-	hdiutil convert ~/Downloads/"${1}"-ro.dmg -format UDRW -o ~/Downloads/"${1}"-rw.dmg
+	hdiutil convert ${download_path}/"${1}"-ro.dmg -format UDRW -o ${download_path}/"${1}"-rw.dmg
 	echo ""	
 
 	# Increase size of image to allow for app rename
 	echo "Calculating image size..."
-	local imgsize=`hdiutil resize -limits ~/Downloads/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+	local imgsize=`hdiutil resize -limits ${download_path}/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
 	echo "Image size is: ${imgsize}" 
 	echo "Growing writable image..."
 	imgsize=$((imgsize + 100)) # Add 100 to DMG size
 	echo "Resizing to: ${imgsize}" 
-	hdiutil resize -sectors ${imgsize} ~/Downloads/"${1}"-rw.dmg
-	local imgsize=`hdiutil resize -limits ~/Downloads/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+	hdiutil resize -sectors ${imgsize} ${download_path}/"${1}"-rw.dmg
+	local imgsize=`hdiutil resize -limits ${download_path}/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
 	echo "New image size is: ${imgsize}" 
 	echo ""	
 
 	# Mount writable DMG to perform edit
 	echo "Mounting image to edit..."
-	hdiutil attach ~/Downloads/"${1}"-rw.dmg
+	hdiutil attach ${download_path}/"${1}"-rw.dmg
 	echo ""
 
 	# Rename Firefox app
@@ -134,22 +137,22 @@ prep_Firefox-ESR() {
 
 	# Compact image to previous size
 	echo "Compacting image..."
-	hdiutil resize -sectors min ~/Downloads/"${1}"-rw.dmg
+	hdiutil resize -sectors min ${download_path}/"${1}"-rw.dmg
 	echo ""	
 
 	# Remove original downloaded image
 	echo "Removing old Read-only image..."
-	rm -f ~/Downloads/"${1}"-ro.dmg
+	rm -f ${download_path}/"${1}"-ro.dmg
 	echo ""	
 
 	# Make new read only image from modified rw DMG
 	echo "Make new read-only image..."
-	hdiutil convert -format UDZO -o ~/Downloads/"${1}"-ro.dmg ~/Downloads/"${1}"-rw.dmg
+	hdiutil convert -format UDZO -o ${download_path}/"${1}"-ro.dmg ${download_path}/"${1}"-rw.dmg
 	echo ""	
 
 	# Clear up writeable DMG
 	echo "Removing unneeded writable-image..."
-	rm -f ~/Downloads/"${1}"-rw.dmg
+	rm -f ${download_path}/"${1}"-rw.dmg
 	echo "Firefox ESR DMG preparation finished!"
 	echo ""
 }
@@ -158,9 +161,9 @@ prep_Firefox-ESR() {
 update_app() {
 	# Clear previous downloads
 	echo "Deleting old downloads..."
-	rm -f ~/Downloads/"${1}"-rw.dmg
-	rm -f ~/Downloads/"${1}"-ro.dmg
-	rm -f ~/Downloads/"${1}".dmg
+	rm -f ${download_path}/"${1}"-rw.dmg
+	rm -f ${download_path}/"${1}"-ro.dmg
+	rm -f ${download_path}/"${1}".dmg
 	echo ""	
 
 	# (Temporary!!) Sets app url for downloading latest version
@@ -168,7 +171,7 @@ update_app() {
 
 	# Download latest release of app
 	echo "Downloading newer release image..."
-	wget "${app_url}" -O ~/Downloads/"${1}"-ro.dmg
+	wget "${app_url}" -O ${download_path}/"${1}"-ro.dmg
 	echo "${1} downloaded."
 	echo ""
 
@@ -184,12 +187,12 @@ update_app() {
 	
 	# Rename DMG to remove permissions suffix
 	echo "Renaming DMG to ${1}.dmg..."
-	mv ~/Downloads/"${1}"-ro.dmg ~/Downloads/"${1}".dmg
+	mv ${download_path}/"${1}"-ro.dmg ${download_path}/"${1}".dmg
 	echo ""
 
 	# Import app to Munki repo
 	echo "Starting Munki import..."
-	/usr/local/munki/munkiimport --subdirectory="${2}" ~/Downloads/"${1}".dmg
+	/usr/local/munki/munkiimport --subdirectory="${2}" ${download_path}/"${1}".dmg
 }
 
 # Checks existing versions of all apps in Munki repo and compare
