@@ -40,5 +40,6 @@ Changelog:
 	- Made app update method universal to support adding new apps  
 	- Added support for Mozilla Thunderbird  
 	- Small fixes  
+	- Renamed main script to reflect added support for non-Firefox apps.
 
 	
