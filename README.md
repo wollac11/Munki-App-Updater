@@ -22,3 +22,12 @@ Changelog:
 --0.5 (23/03/2017):  
 	- Script now checks that a method exists for finding the latest online version 
 	of each given app before attempting to run it.
+
+--0.6 (23/03/2017):  
+	Note: currently app_url is hardcoded for supported apps. Support for specifying app_url will be added in a future update
+
+	- Any app which needs some edits before importing
+	may now specify a method to perform such edits and script will run said
+	method. If none is specified then script will proceed to import DMG as
+	it is from download.  
+	- Fixed some indentation errors
