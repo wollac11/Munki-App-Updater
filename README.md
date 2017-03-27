@@ -18,3 +18,7 @@ Changelog:
 --0.4 (22/03/2017):  
 	- Added blank lines between different operations to make output easier read  
 	- Added script completion message
+
+--0.5 (23/03/2017):  
+	- Script now checks that a method exists for finding the latest online version 
+	of each given app before attempting to run it.
