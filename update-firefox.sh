@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.4
+# Version 0.5
 # Charlie Callow 2017
 
 # Config
@@ -16,7 +16,7 @@ app_path[1]="apps/firefox-esr"
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 0.4------"
+echo "------Version 0.5------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo ""
@@ -25,8 +25,13 @@ for ((i=0; i<${#app_name[*]}; i++));
 do
 	echo "${app_name[i]}"
 done
-echo ""
 
+
+# Checks if a given function exists
+function_exists() {
+    declare -f -F $1 > /dev/null
+    return $?
+}
 
 # Checks version of app in Munki repo
 check_version() {
@@ -37,13 +42,13 @@ check_version() {
         done
 
 	version="${files[@]: -1}"	# access last member of array (most recent .pkginfo)
-	version="${version%__*}"		# remove Munki suffixes
+	version="${version%__*}"	# remove Munki suffixes
 	version="${version//[!0-9.]/}"	# remove non-decimal characters
 	echo "${version}"		# output version 
 }
 
 # Checks latest version of app available online
-check_avail_version() {
+check_avail_Firefox() {
 	# Set correct firefox channel for lookup
 	if [ "$1" == "Firefox" ]
 	then
@@ -57,6 +62,10 @@ check_avail_version() {
 	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-${ffchannel}&os=linux&lang=en-GB" 2>&1 | sed -n '/Location: /{s|.*/firefox-\(.*\)\.tar.*|\1|p;q;}')
 	avversion="${avversion//[!0-9.]/}"	# remove non-decimal characters
 	echo "${avversion}" # output discovered version
+}
+
+check_avail_Firefox-ESR() {
+	check_avail_Firefox $1
 }
 
 # Compares two version strings, returns 10 if they are equal, 9 if
@@ -179,14 +188,23 @@ update_app() {
 # version is newer than that in the repo
 for ((i=0; i<${#app_name[*]}; i++));
 do
+	echo ""
+
 	# Check version of app in Munki repo
 	echo "Checking existing ${app_name[$i]} version in repo..."
 	check_version "${munkirepo}pkgsinfo/${app_path[$i]}"
 	echo ""
 
-	# Check latest available version online
-	echo "Checking latest online version..."
-	check_avail_version "${app_name[$i]}"
+	# Verify update check function exists for app
+	function_exists "check_avail_${app_name[$i]}"
+	if [ "$?" != "0" ]; then
+		# No update checker, skip to next app
+		echo "No update check function for app"
+		continue
+	fi
+
+	echo "Checking latest online version."
+	check_avail_"${app_name[$i]}" "${app_name[$i]}"	# check latest available version online
 	echo ""
 	
 	# Compare versions in Munki repo with the latest available online
@@ -199,6 +217,6 @@ do
   	*   ) echo "Something went wrong!";;
   	esac
 	echo "${app_name[$i]} is up to date!"
-	echo ""
 done
+echo ""
 echo "All apps up to date! Exiting..."
