@@ -9,21 +9,26 @@ Changelog:
 	- Initial Release
 
 --0.2 (21/03/2017):  
+
 	- Changed online version check method to order files by
 	modification date in order to fix bug where .1 releases would be ignored
 
 --0.3 (21/03/2017):  
+
 	- Added an app intro message which outputs release info and lists apps it is updating.
 
 --0.4 (22/03/2017):  
+
 	- Added blank lines between different operations to make output easier read  
 	- Added script completion message
 
 --0.5 (23/03/2017):  
+
 	- Script now checks that a method exists for finding the latest online version 
 	of each given app before attempting to run it.
 
 --0.6 (23/03/2017):  
+
 	Note: currently app url is hardcoded for supported apps. This will be addressed in an update.  
 
 	- Any app which needs some edits before importing
@@ -33,6 +38,7 @@ Changelog:
 	- Fixed some indentation errors
 
 --0.7 (24/03/2017):  
+
 	- Now checks online version for OSX build instead of Linux build  
 	- Separted Firefox & Firefox ESR update checks  
 	- Changed download path to variable which defaults to a DMG directory
