@@ -24,7 +24,8 @@ Changelog:
 	of each given app before attempting to run it.
 
 --0.6 (23/03/2017):  
-	Note: currently "app_url" is hardcoded for supported apps. This will be addressed in an update.
+	Note: currently "app_url" is hardcoded for supported apps. This will be addressed in an update.  
+
 	- Any app which needs some edits before importing
 	may now specify a method to perform such edits and script will run said
 	method. If none is specified then script will proceed to import DMG as

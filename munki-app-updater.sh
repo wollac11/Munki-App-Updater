@@ -99,65 +99,80 @@ version_compare() {
    fi
 }    
 
+# Makes enlarged writable DMG image and mounts it so edits
+# can be made to the app
+prep_dmg_start() {
+
+	# Make writable copy of DMG
+	echo "Making writeable image"
+	hdiutil convert "${download_path}"/"${1}"-ro.dmg -format UDRW -o "${download_path}"/"${1}"-rw.dmg
+	echo ""
+
+        # Increase size of image to allow for app rename
+        echo "Calculating image size..."
+        local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+        echo "Image size is: ${imgsize}"
+        echo "Growing writable image..."
+        imgsize=$((imgsize + 100)) # Add 100 to DMG size
+        echo "Resizing to: ${imgsize}"
+        hdiutil resize -sectors ${imgsize} "${download_path}"/"${1}"-rw.dmg
+        local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+        echo "New image size is: ${imgsize}"
+        echo ""
+
+        # Mount writable DMG to perform edit
+        echo "Mounting image to edit..."
+        hdiutil attach "${download_path}"/"${1}"-rw.dmg
+        echo ""
+
+}
+
+# Detaches DMG, compacts it and makes it read only
+prep_dmg_end() {
+        #  Unmount DMG 
+        echo "Detaching image..."
+        hdiutil detach /Volumes/Firefox
+        echo ""
+
+        # Compact image to previous size
+        echo "Compacting image..."
+        hdiutil resize -sectors min "${download_path}"/"${1}"-rw.dmg
+        echo ""
+
+        # Remove original downloaded image
+        echo "Removing old Read-only image..."
+        rm -f "${download_path}"/"${1}"-ro.dmg
+        echo ""
+
+        # Make new read only image from modified rw DMG
+        echo "Make new read-only image..."
+        hdiutil convert -format UDZO -o "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}"-rw.dmg
+        echo ""
+
+        # Clear up writeable DMG
+        echo "Removing unneeded writable-image..."
+        rm -f "${download_path}"/"${1}"-rw.dmg
+        echo "Firefox ESR DMG preparation finished!"
+        echo ""
+}
+
 # Edits Firefox ESR DMG to give make distinct from standard Firefox
 # channel to avoid confusing Munki (renames app to "Firefox-ESR")
 prep_Firefox-ESR() {
 	echo ""
 	echo "Modifying DMG to rename Firefox.app..."
         echo ""
-
-	# Make writable copy of DMG
-	echo "Making writeable image"
-	hdiutil convert "${download_path}"/"${1}"-ro.dmg -format UDRW -o "${download_path}"/"${1}"-rw.dmg
-	echo ""	
-
-	# Increase size of image to allow for app rename
-	echo "Calculating image size..."
-	local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
-	echo "Image size is: ${imgsize}" 
-	echo "Growing writable image..."
-	imgsize=$((imgsize + 100)) # Add 100 to DMG size
-	echo "Resizing to: ${imgsize}" 
-	hdiutil resize -sectors ${imgsize} "${download_path}"/"${1}"-rw.dmg
-	local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
-	echo "New image size is: ${imgsize}" 
-	echo ""	
-
-	# Mount writable DMG to perform edit
-	echo "Mounting image to edit..."
-	hdiutil attach "${download_path}"/"${1}"-rw.dmg
-	echo ""
+	
+	# Make & mount writable image for edits
+	prep_dmg_start "${1}"
 
 	# Rename Firefox app
 	echo "Renaming Firefox.app to Firefox-ESR.app"
 	mv /Volumes/Firefox/Firefox.app /Volumes/Firefox/Firefox-ESR.app
 	echo ""	
 
-	#  Unmount DMG 
-	echo "Detaching image..."
-	hdiutil detach /Volumes/Firefox
-	echo ""	
-
-	# Compact image to previous size
-	echo "Compacting image..."
-	hdiutil resize -sectors min "${download_path}"/"${1}"-rw.dmg
-	echo ""	
-
-	# Remove original downloaded image
-	echo "Removing old Read-only image..."
-	rm -f "${download_path}"/"${1}"-ro.dmg
-	echo ""	
-
-	# Make new read only image from modified rw DMG
-	echo "Make new read-only image..."
-	hdiutil convert -format UDZO -o "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}"-rw.dmg
-	echo ""	
-
-	# Clear up writeable DMG
-	echo "Removing unneeded writable-image..."
-	rm -f "${download_path}"/"${1}"-rw.dmg
-	echo "Firefox ESR DMG preparation finished!"
-	echo ""
+	# Detach DMG and make read only
+	prep_dmg_end "${1}"
 }
 
 # Downloads latest version of app and imports to Munki repo
