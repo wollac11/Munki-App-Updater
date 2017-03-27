@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.7
+# Version 1.0
 # Charlie Callow 2017
 
 # Config
@@ -14,7 +14,7 @@ apps=(./apps/*.sh) # Build array of app updaters
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 0.7------"
+echo "------Version 1.0------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo ""
