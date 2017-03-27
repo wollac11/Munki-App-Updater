@@ -2,21 +2,21 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.3
+# Version 0.4
 # Charlie Callow 2017
 
 # Config
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
 app_name[0]="Firefox"
-app_path[0]=apps/firefox
+app_path[0]="apps/firefox"
 app_name[1]="Firefox-ESR"
-app_path[1]=apps/firefox-esr
+app_path[1]="apps/firefox-esr"
 
 # Intro
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 0.3------"
+echo "------Version 0.4------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo ""
@@ -90,7 +90,8 @@ rename_esr() {
 	# Make writable copy of DMG
 	echo "Making writeable image"
 	hdiutil convert ~/Downloads/"${1}"-ro.dmg -format UDRW -o ~/Downloads/"${1}"-rw.dmg
-	
+	echo ""	
+
 	# Increase size of image to allow for app rename
 	echo "Calculating image size..."
 	local imgsize=`hdiutil resize -limits ~/Downloads/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
@@ -101,35 +102,43 @@ rename_esr() {
 	hdiutil resize -sectors ${imgsize} ~/Downloads/"${1}"-rw.dmg
 	local imgsize=`hdiutil resize -limits ~/Downloads/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
 	echo "New image size is: ${imgsize}" 
-	
+	echo ""	
+
 	# Mount writable DMG to perform edit
 	echo "Mounting image to edit..."
 	hdiutil attach ~/Downloads/"${1}"-rw.dmg
-	
+	echo ""
+
 	# Rename Firefox app
 	echo "Renaming Firefox.app to Firefox-ESR.app"
 	mv /Volumes/Firefox/Firefox.app /Volumes/Firefox/Firefox-ESR.app
-	
+	echo ""	
+
 	#  Unmount DMG 
 	echo "Detaching image..."
 	hdiutil detach /Volumes/Firefox
-	
+	echo ""	
+
 	# Compact image to previous size
 	echo "Compacting image..."
 	hdiutil resize -sectors min ~/Downloads/"${1}"-rw.dmg
-	
+	echo ""	
+
 	# Remove original downloaded image
 	echo "Removing old Read-only image..."
 	rm -f ~/Downloads/"${1}"-ro.dmg
-	
+	echo ""	
+
 	# Make new read only image from modified rw DMG
 	echo "Make new read-only image..."
 	hdiutil convert -format UDZO -o ~/Downloads/"${1}"-ro.dmg ~/Downloads/"${1}"-rw.dmg
-	
+	echo ""	
+
 	# Clear up writeable DMG
 	echo "Removing unneeded writable-image..."
 	rm -f ~/Downloads/"${1}"-rw.dmg
 	echo "Firefox ESR DMG preparation finished!"
+	echo ""
 }
 
 # Downloads latest version of app and imports to Munki repo
@@ -138,24 +147,28 @@ update_app() {
 	echo "Deleting old downloads..."
 	rm -f ~/Downloads/"${1}"-rw.dmg
 	rm -f ~/Downloads/"${1}"-ro.dmg
-	
+	echo ""	
+
 	# Download latest release of app
 	echo "Downloading newer release image..."
 	wget "https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB" -O ~/Downloads/"${1}"-ro.dmg
 	echo "${1} downloaded."
+	echo ""
 
 	# Check if Firefox ESR we are updating, if so modify DMG to rename
 	# Firefox.app within to Firefox-ESR.app
 	if [ "${1}" == "Firefox-ESR" ]; then
 		echo "Firefox ESR DMG needs modification!"
 		echo "Modifying DMG to rename Firefox.app..."
+		echo ""
 		rename_esr $1
 	fi
 	
 	# Rename DMG to remove permissions suffix
 	echo "Renaming DMG to ${1}.dmg..."
 	mv ~/Downloads/"${1}"-ro.dmg ~/Downloads/"${1}".dmg
-	
+	echo ""
+
 	# Import app to Munki repo
 	echo "Starting Munki import..."
 	/usr/local/munki/munkiimport --subdirectory="${2}" ~/Downloads/"${1}".dmg
@@ -169,10 +182,12 @@ do
 	# Check version of app in Munki repo
 	echo "Checking existing ${app_name[$i]} version in repo..."
 	check_version "${munkirepo}pkgsinfo/${app_path[$i]}"
-	 
+	echo ""
+
 	# Check latest available version online
 	echo "Checking latest online version..."
 	check_avail_version "${app_name[$i]}"
+	echo ""
 	
 	# Compare versions in Munki repo with the latest available online
 	version_compare "${version}" "${avversion}"
@@ -184,4 +199,6 @@ do
   	*   ) echo "Something went wrong!";;
   	esac
 	echo "${app_name[$i]} is up to date!"
+	echo ""
 done
+echo "All apps up to date! Exiting..."
