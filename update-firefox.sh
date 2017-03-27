@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# Munki App Updater
 # Checks and updates munki packages
-# Version 0.1
+# Version 0.2
 # Charlie Callow 2017
 
 # Config
@@ -13,17 +14,16 @@ app_path[1]=apps/firefox-esr
 
 # Checks version of app in Munki repo
 check_version() {
-	local prev=$(pwd) # remember current working directory
-	cd $1 # change to app directory
-	for dir in ./*
-	do
-    		files=($dir/*)		# create an array of plists
-	done
+	# Create an array of .pkginfo files in app directory
+        # (ordered by ascending modification time)
+        for dir in $(ls -tr $1/*.pkginfo); do
+                files=(`basename $dir .pkginfo`)
+        done
+
 	version="${files[@]: -1}"	# access last member of array (most recent .pkginfo)
 	version="${version%__*}"		# remove Munki suffixes
 	version="${version//[!0-9.]/}"	# remove non-decimal characters
-	echo "${version:1}"		# output version
-	cd "${prev}"		# return to previous working directory 
+	echo "${version}"		# output version 
 }
 
 # Checks latest version of app available online
@@ -159,7 +159,7 @@ do
 	check_avail_version "${app_name[$i]}"
 	
 	# Compare versions in Munki repo with the latest available online
-	version_compare "${version:1}" "${avversion}"
+	version_compare "${version}" "${avversion}"
 	case "$?" in
  	"9") echo "Newer release available!"
 		update_app "${app_name[$i]}" "${app_path[$i]}"	;;	# Run update process for the app
