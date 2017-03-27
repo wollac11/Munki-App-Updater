@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.6
+# Version 0.7
 # Charlie Callow 2017
 
 # Config
@@ -14,6 +14,7 @@ app_path[0]="apps/firefox"
 app_url[0]="https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-GB"
 app_name[1]="Firefox-ESR"
 app_path[1]="apps/firefox-esr"
+app_url[1]="https://download.mozilla.org/?product=firefox-esr-latest&os=osx&lang=en-GB"
 app_name[2]="Thunderbird"
 app_path[2]="apps/thunderbird"
 app_url[2]="https://download.mozilla.org/?product=thunderbird-latest&os=osx&lang=en-GB"
@@ -22,7 +23,7 @@ app_url[2]="https://download.mozilla.org/?product=thunderbird-latest&os=osx&lang
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 0.6------"
+echo "------Version 0.7------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo ""
@@ -107,24 +108,24 @@ prep_Firefox-ESR() {
 
 	# Make writable copy of DMG
 	echo "Making writeable image"
-	hdiutil convert ${download_path}/"${1}"-ro.dmg -format UDRW -o ${download_path}/"${1}"-rw.dmg
+	hdiutil convert "${download_path}"/"${1}"-ro.dmg -format UDRW -o "${download_path}"/"${1}"-rw.dmg
 	echo ""	
 
 	# Increase size of image to allow for app rename
 	echo "Calculating image size..."
-	local imgsize=`hdiutil resize -limits ${download_path}/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+	local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
 	echo "Image size is: ${imgsize}" 
 	echo "Growing writable image..."
 	imgsize=$((imgsize + 100)) # Add 100 to DMG size
 	echo "Resizing to: ${imgsize}" 
-	hdiutil resize -sectors ${imgsize} ${download_path}/"${1}"-rw.dmg
-	local imgsize=`hdiutil resize -limits ${download_path}/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+	hdiutil resize -sectors ${imgsize} "${download_path}"/"${1}"-rw.dmg
+	local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
 	echo "New image size is: ${imgsize}" 
 	echo ""	
 
 	# Mount writable DMG to perform edit
 	echo "Mounting image to edit..."
-	hdiutil attach ${download_path}/"${1}"-rw.dmg
+	hdiutil attach "${download_path}"/"${1}"-rw.dmg
 	echo ""
 
 	# Rename Firefox app
@@ -139,22 +140,22 @@ prep_Firefox-ESR() {
 
 	# Compact image to previous size
 	echo "Compacting image..."
-	hdiutil resize -sectors min ${download_path}/"${1}"-rw.dmg
+	hdiutil resize -sectors min "${download_path}"/"${1}"-rw.dmg
 	echo ""	
 
 	# Remove original downloaded image
 	echo "Removing old Read-only image..."
-	rm -f ${download_path}/"${1}"-ro.dmg
+	rm -f "${download_path}"/"${1}"-ro.dmg
 	echo ""	
 
 	# Make new read only image from modified rw DMG
 	echo "Make new read-only image..."
-	hdiutil convert -format UDZO -o ${download_path}/"${1}"-ro.dmg ${download_path}/"${1}"-rw.dmg
+	hdiutil convert -format UDZO -o "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}"-rw.dmg
 	echo ""	
 
 	# Clear up writeable DMG
 	echo "Removing unneeded writable-image..."
-	rm -f ${download_path}/"${1}"-rw.dmg
+	rm -f "${download_path}"/"${1}"-rw.dmg
 	echo "Firefox ESR DMG preparation finished!"
 	echo ""
 }
@@ -214,13 +215,14 @@ do
 	# Verify update check function exists for app
 	function_exists "check_avail_${app_name[$i]}"
 	if [ "$?" != "0" ]; then
-		# No update checker, skip to next app
-		echo "No update check function for app"
+		# No update checking function, skip to next app
+		echo "Error: No update check function for app!"
+		echo "Skipping online update check for ${app_name[$i]}."
 		continue
 	fi
 
 	echo "Checking latest online version."
-	check_avail_"${app_name[$i]}" "${app_name[$i]}"	# check latest available version online
+	check_avail_"${app_name[$i]}"	# check latest available version online
 	echo ""
 	
 	# Compare versions in Munki repo with the latest available online
