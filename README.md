@@ -11,3 +11,6 @@ Changelog:
 --0.2 (21/03/2017):  
 	- Changed online version check method to order files by
 	modification date in order to fix bug where .1 releases would be ignored
+
+--0.3 (21/03/2017):  
+	- Added an app intro message which outputs release info and lists apps it is updating.
