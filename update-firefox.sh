@@ -14,6 +14,9 @@ app_path[0]="apps/firefox"
 app_url[0]="https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-GB"
 app_name[1]="Firefox-ESR"
 app_path[1]="apps/firefox-esr"
+app_name[2]="Thunderbird"
+app_path[2]="apps/thunderbird"
+app_url[2]="https://download.mozilla.org/?product=thunderbird-latest&os=osx&lang=en-GB"
 
 # Intro
 clear
@@ -62,6 +65,12 @@ check_avail_Firefox() {
 check_avail_Firefox-ESR() {
 	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-esr-latest&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Firefox%20\([^&]*\)esr.dmg/\1/p;' | head -1)
         echo "${avversion}" # output discovered version
+}
+
+# Checks latest version of Thunderbird available online
+check_avail_Thunderbird() {
+	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=thunderbird-latest&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Thunderbird%20\([^&]*\).dmg/\1/p;' | head -1)
+	echo "${avversion}" # output discovered version
 }
 
 # Compares two version strings, returns 10 if they are equal, 9 if
