@@ -14,3 +14,7 @@ Changelog:
 
 --0.3 (21/03/2017):  
 	- Added an app intro message which outputs release info and lists apps it is updating.
+
+--0.4 (22/03/2017):  
+	- Added blank lines between different operations to make output easier read  
+	- Added script completion message
