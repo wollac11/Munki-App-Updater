@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 0.5
+# Version 0.6
 # Charlie Callow 2017
 
 # Config
@@ -16,7 +16,7 @@ app_path[1]="apps/firefox-esr"
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 0.5------"
+echo "------Version 0.6------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo ""
@@ -95,7 +95,11 @@ version_compare() {
 
 # Edits Firefox ESR DMG to give make distinct from standard Firefox
 # channel to avoid confusing Munki (renames app to "Firefox-ESR")
-rename_esr() {
+prep_Firefox-ESR() {
+	echo ""
+	echo "Modifying DMG to rename Firefox.app..."
+        echo ""
+
 	# Make writable copy of DMG
 	echo "Making writeable image"
 	hdiutil convert ~/Downloads/"${1}"-ro.dmg -format UDRW -o ~/Downloads/"${1}"-rw.dmg
@@ -156,22 +160,27 @@ update_app() {
 	echo "Deleting old downloads..."
 	rm -f ~/Downloads/"${1}"-rw.dmg
 	rm -f ~/Downloads/"${1}"-ro.dmg
+	rm -f ~/Downloads/"${1}".dmg
 	echo ""	
+
+	# (Temporary!!) Sets app url for downloading latest version
+        app_url="https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB"
 
 	# Download latest release of app
 	echo "Downloading newer release image..."
-	wget "https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB" -O ~/Downloads/"${1}"-ro.dmg
+	wget "${app_url}" -O ~/Downloads/"${1}"-ro.dmg
 	echo "${1} downloaded."
 	echo ""
 
-	# Check if Firefox ESR we are updating, if so modify DMG to rename
-	# Firefox.app within to Firefox-ESR.app
-	if [ "${1}" == "Firefox-ESR" ]; then
-		echo "Firefox ESR DMG needs modification!"
-		echo "Modifying DMG to rename Firefox.app..."
+	function_exists "prep_${1}"
+    if [ "$?" = "0" ]; then
+		echo "${1} DMG needs modification!"
+		prep_"${1}" "${1}"
+	else
+                # No prep funcion, skip to import
+                echo "No prep function for app. Importing as is..."
 		echo ""
-		rename_esr $1
-	fi
+    fi
 	
 	# Rename DMG to remove permissions suffix
 	echo "Renaming DMG to ${1}.dmg..."
