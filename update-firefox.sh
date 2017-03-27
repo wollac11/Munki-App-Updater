@@ -151,49 +151,43 @@ prep_Firefox-ESR() {
 }
 
 # Downloads latest version of app and imports to Munki repo
+# Requires app_name (1), app_url (2) and app_path (3) as arguments
 update_app() {
+	
+	# Make download directory (if it doesn't exist)
+	mkdir -p "${download_path}";
+	
 	# Clear previous downloads
 	echo "Deleting old downloads..."
-	rm -f ${download_path}/"${1}"-rw.dmg
-	rm -f ${download_path}/"${1}"-ro.dmg
-	rm -f ${download_path}/"${1}".dmg
+	rm -f "${download_path}"/"${1}"-rw.dmg
+	rm -f "${download_path}"/"${1}"-ro.dmg
+	rm -f "${download_path}"/"${1}".dmg
 	echo ""	
-
-	# Set correct firefox channel for lookup
-	if [ "$1" == "Firefox" ]
-	then
-		ffchannel="latest"
-	else
-		ffchannel="esr-latest"
-	fi
-
-	# (Temporary!!) Sets app url for downloading latest version
-        app_url="https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB"
 
 	# Download latest release of app
 	echo "Downloading newer release image..."
-	wget "${app_url}" -O ${download_path}/"${1}"-ro.dmg
+	wget "${2}" -O "${download_path}"/"${1}"-ro.dmg
 	echo "${1} downloaded."
 	echo ""
 
 	function_exists "prep_${1}"
-    if [ "$?" = "0" ]; then
+    	if [ "$?" = "0" ]; then
 		echo "${1} DMG needs modification!"
 		prep_"${1}" "${1}"
 	else
                 # No prep funcion, skip to import
                 echo "No prep function for app. Importing as is..."
 		echo ""
-    fi
+	fi
 	
 	# Rename DMG to remove permissions suffix
 	echo "Renaming DMG to ${1}.dmg..."
-	mv ${download_path}/"${1}"-ro.dmg ${download_path}/"${1}".dmg
+	mv "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}".dmg
 	echo ""
 
 	# Import app to Munki repo
 	echo "Starting Munki import..."
-	/usr/local/munki/munkiimport --subdirectory="${2}" ${download_path}/"${1}".dmg
+	/usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${1}".dmg
 }
 
 # Checks existing versions of all apps in Munki repo and compare
@@ -224,7 +218,7 @@ do
 	version_compare "${version}" "${avversion}"
 	case "$?" in
  	"9") echo "Newer release available!"
-		update_app "${app_name[$i]}" "${app_path[$i]}"	;;	# Run update process for the app
+		update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}"	;;	# Run update process for the app
         "10") echo "Munki repo matches online. Nothing to do." ;;
         "11") echo "Munki repo has newer release. Nothing to do." ;;
   	*   ) echo "Something went wrong!";;
