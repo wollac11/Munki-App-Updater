@@ -7,3 +7,6 @@ Changelog:
 
 --0.1 (07/03/2017):
 	- Initial Release
+--0.2 (21/03/2017):
+	- Changed online version check method to order files by
+	modification date in order to fix bug where .1 releases would be ignored
