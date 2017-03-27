@@ -51,24 +51,17 @@ check_version() {
 }
 
 # Checks latest version of app available online
-check_avail_Firefox() {
-	# Set correct firefox channel for lookup
-	if [ "$1" == "Firefox" ]
-	then
-		ffchannel="latest"
-	else
-		ffchannel="esr-latest"
-	fi
-	
+check_avail_Firefox() {	
 	# Determine latest version available to download and store version
 	# string for comparison to Munki repo version
-	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Firefox%20\([^&]*\).dmg/\1/p;' | head -1)
-	avversion="${avversion//[!0-9.]/}"	# remove non-decimal characters
+	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-latest&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Firefox%20\([^&]*\).dmg/\1/p;' | head -1)
 	echo "${avversion}" # output discovered version
 }
 
+# Checks latest version of Firefox ESR available online
 check_avail_Firefox-ESR() {
-	check_avail_Firefox $1
+	avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-esr-latest&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Firefox%20\([^&]*\)esr.dmg/\1/p;' | head -1)
+        echo "${avversion}" # output discovered version
 }
 
 # Compares two version strings, returns 10 if they are equal, 9 if
@@ -165,6 +158,14 @@ update_app() {
 	rm -f ${download_path}/"${1}"-ro.dmg
 	rm -f ${download_path}/"${1}".dmg
 	echo ""	
+
+	# Set correct firefox channel for lookup
+	if [ "$1" == "Firefox" ]
+	then
+		ffchannel="latest"
+	else
+		ffchannel="esr-latest"
+	fi
 
 	# (Temporary!!) Sets app url for downloading latest version
         app_url="https://download.mozilla.org/?product=firefox-${ffchannel}&os=osx&lang=en-GB"
