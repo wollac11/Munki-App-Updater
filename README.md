@@ -24,7 +24,7 @@ Changelog:
 	of each given app before attempting to run it.
 
 --0.6 (23/03/2017):  
-	Note: currently "app_url" is hardcoded for supported apps. This will be addressed in an update.  
+	Note: currently app url is hardcoded for supported apps. This will be addressed in an update.  
 
 	- Any app which needs some edits before importing
 	may now specify a method to perform such edits and script will run said
@@ -32,7 +32,7 @@ Changelog:
 	it is from download.  
 	- Fixed some indentation errors
 
---0.7 (27/03/2017):  
+--0.7 (24/03/2017):  
 	- Now checks online version for OSX build instead of Linux build  
 	- Separted Firefox & Firefox ESR update checks  
 	- Changed download path to variable which defaults to a DMG directory
@@ -43,4 +43,11 @@ Changelog:
 	- Small fixes  
 	- Renamed main script to reflect added support for non-Firefox apps.
 
-	
+--1.0 (27/03/2017):  
+	First full release!
+
+	- Split Firefox-ESR prep method into to allow for code re-use on other apps 
+	which need modifications.
+	- Moved app-specific methods into external files
+	- New feature: script reads external files for each app in /apps directory
+	so that new apps can easily be added by writing a short app script.
