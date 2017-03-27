@@ -1,7 +1,7 @@
 # Munki App Updater
 Checks &amp; updates Munki packaged apps for managed OSX machines
 
-Supported apps: Firefox, Firefox ESR
+Supported apps: Firefox, Firefox ESR, Thunderbird
 
 Changelog:
 
@@ -24,10 +24,21 @@ Changelog:
 	of each given app before attempting to run it.
 
 --0.6 (23/03/2017):  
-	Note: currently app_url is hardcoded for supported apps. Support for specifying app_url will be added in a future update
-
+	Note: currently "app_url" is hardcoded for supported apps. This will be addressed in an update.
 	- Any app which needs some edits before importing
 	may now specify a method to perform such edits and script will run said
 	method. If none is specified then script will proceed to import DMG as
 	it is from download.  
 	- Fixed some indentation errors
+
+--0.7 (27/03/2017):  
+	- Now checks online version for OSX build instead of Linux build  
+	- Separted Firefox & Firefox ESR update checks  
+	- Changed download path to variable which defaults to a DMG directory
+	inside the current working directory (instead of hard-coded to ~/Downloads)  
+	- Streamlined online update checks for Firefox and Firefox ESR  
+	- Made app update method universal to support adding new apps  
+	- Added support for Mozilla Thunderbird  
+	- Small fixes  
+
+	
