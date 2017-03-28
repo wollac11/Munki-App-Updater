@@ -5,8 +5,9 @@ Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop
 
 <details> 
 	<summary>
-		Changelog:
+		Changelog
 	</summary>
+
 		--0.1 (07/03/2017):  
 			- Initial Release
 
