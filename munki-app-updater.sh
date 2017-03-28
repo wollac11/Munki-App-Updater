@@ -44,8 +44,8 @@ function_exists() {
 check_version() {
 	# Create an array of .pkginfo files in app directory
         # (ordered by ascending modification time)
-        for dir in $(ls -tr $1/*.pkginfo); do
-                files=(`basename $dir .pkginfo`)
+        for dir in $(ls -tr $1/*.p*); do
+                files=($dir)
         done
 
 	version="${files[@]: -1}"	# access last member of array (most recent .pkginfo)
