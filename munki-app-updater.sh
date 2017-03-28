@@ -185,7 +185,7 @@ do
 	echo ""
 
 	# Verify update check function exists for app
-	function_exists "check_avail_${app_name[$i]}"
+	function_exists "check_avail_${app_name[$i]// /_}"
 	if [ "$?" != "0" ]; then
 		# No update checking function, skip to next app
 		echo "Error: No update check function for app!"
@@ -194,7 +194,7 @@ do
 	fi
 
 	echo "Checking latest online version."
-	check_avail_"${app_name[$i]}"	# check latest available version online
+	check_avail_"${app_name[$i]// /_}"	# check latest available version online
 	echo ""
 	
 	# Compare versions in Munki repo with the latest available online
