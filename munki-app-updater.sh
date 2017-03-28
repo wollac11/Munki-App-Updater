@@ -20,10 +20,15 @@ echo "-----------------------"
 echo ""
 echo "Apps to update:"
 
-# iterate through array using a counter
+# Iterate through apps array using a counter
 for ((i=0; i<${#apps[@]}; i++)); do
+	# Include current app updater script
         source "${apps[$i]}"
+	
+	# Output app name
         echo "${munki_name}"
+
+	# Build arrays of app properties
         app_name[i]="${munki_name}"
         app_path[i]="${munki_path}"
         app_url[i]="${down_url}"
