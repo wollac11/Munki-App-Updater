@@ -53,12 +53,14 @@ Changelog:
 	First full release!
 
 	- Split Firefox-ESR prep method into to allow for code re-use on other apps 
-	which need modifications.
-	- Moved app-specific methods into external files
-	- New feature: script reads external files for each app in /apps directory
+	which need modifications.  
+	- Moved app-specific methods into external files  
+	- New feature: script reads external files for each app in /apps directory  
 	so that new apps can easily be added by writing a short app script.
+
 --1.1 (28/03/2017):  
-	- Fixed: handling of spaces in Munki package names
-	- Added: support for Munki pkginfo files with a .plist extension
-	- Added: provider for updating Mendeley Desktop
+
+	- Fixed: handling of spaces in Munki package names  
+	- Added: support for Munki pkginfo files with a .plist extension  
+	- Added: provider for updating Mendeley Desktop  
 	- Misc code improvements
