@@ -52,7 +52,6 @@ check_version() {
 # Compares two version strings, returns 10 if they are equal, 9 if
 # the 1st < 2nd and 11 if 2nd < 1st.
 version_compare() {
-
    [ "$1" == "$2" ] && return 10
 
    ver1front=`echo $1 | cut -d "." -f -1`
@@ -77,7 +76,6 @@ version_compare() {
 # Makes enlarged writable DMG image and mounts it so edits
 # can be made to the app
 prep_dmg_start() {
-
 	# Make writable copy of DMG
 	echo "Making writeable image"
 	hdiutil convert "${download_path}"/"${1}"-ro.dmg -format UDRW -o "${download_path}"/"${1}"-rw.dmg
@@ -99,7 +97,6 @@ prep_dmg_start() {
         echo "Mounting image to edit..."
         hdiutil attach "${download_path}"/"${1}"-rw.dmg
         echo ""
-
 }
 
 # Detaches DMG, compacts it and makes it read only
@@ -133,8 +130,7 @@ prep_dmg_end() {
 
 # Downloads latest version of app and imports to Munki repo
 # Requires app_name (1), app_url (2) and app_path (3) as arguments
-update_app() {
-	
+update_app() {	
 	# Make download directory (if it doesn't exist)
 	mkdir -p "${download_path}";
 	
