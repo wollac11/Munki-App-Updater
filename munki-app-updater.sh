@@ -7,7 +7,7 @@
 
 # Config
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
-download_path="./DMGs"
+download_path=$(mktemp -d) # Create temporary download directory
 apps=(./apps/*.sh) # Build array of app updaters
 
 # Intro
@@ -135,15 +135,10 @@ prep_dmg_end() {
 
 # Downloads latest version of app and imports to Munki repo
 # Requires app_name (1), app_url (2) and app_path (3) as arguments
-update_app() {	
-	# Make download directory (if it doesn't exist)
-	mkdir -p "${download_path}";
-	
+update_app() {		
 	# Clear previous downloads
 	echo "Deleting old downloads..."
-	rm -f "${download_path}"/"${1}"-rw.dmg
-	rm -f "${download_path}"/"${1}"-ro.dmg
-	rm -f "${download_path}"/"${1}".dmg
+        rm -rf "${download_path}"/*
 	echo ""	
 
 	# Download latest release of app
@@ -208,5 +203,9 @@ do
   	esac
 	echo "${app_name[$i]} is up to date!"
 done
+echo ""
+echo "Removing temporary download directory..."
+rmdir "${download_path}"
+echo "Done!"
 echo ""
 echo "All apps up to date! Exiting..."
