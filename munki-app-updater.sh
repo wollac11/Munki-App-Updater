@@ -138,7 +138,11 @@ prep_dmg_end() {
 update_app() {		
 	# Clear previous downloads
 	echo "Deleting old downloads..."
+  # Check download_path set (for saftey!!)
+  if [ -v $download_path ] then
+        # Clear contents of download path
         rm -rf "${download_path}"/*
+  fi
 	echo ""	
 
 	# Download latest release of app
