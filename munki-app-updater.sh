@@ -147,6 +147,12 @@ update_app() {
     fi
     echo "" 
 
+    # Download latest release of app
+    echo "Downloading latest release..."
+    wget --trust-server-names "${2}" -P "${download_path}"
+    echo "${1} downloaded."
+    echo ""
+    
     # Get name of downloaded file
     file_name=$(echo "${download_path}"/*) 
     file_name=$(basename "${file_name}") # Remove path
