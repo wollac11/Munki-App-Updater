@@ -187,6 +187,9 @@ update_app() {
     # Import app to Munki repo
     echo "Starting Munki import of ${file_name}..."
     /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
+
+    # Report success
+    echo "The munki package for "${1}" has been updated successfully!" && echo ""
 }
 
 # Checks existing versions of all apps in Munki repo and compare
@@ -229,7 +232,5 @@ do
     "11") echo "Munki repo has newer release. Nothing to do." ;;
     *   ) echo "Something went wrong!";;
     esac
-    echo "${app_name[$i]} is up to date!"
-    echo ""
 done
 echo "All apps up to date! Exiting..."
