@@ -51,6 +51,8 @@ check_version() {
 	version="${files[@]: -1}"	# access last member of array (most recent .pkginfo)
 	version="${version%__*}"	# remove Munki suffixes
 	version="${version//[!0-9.]/}"	# remove non-decimal characters
+	version="${version#.}" # remove preceding "."
+	version="${version%.}" # remove following "."
 	echo "${version}"		# output version 
 }
 
