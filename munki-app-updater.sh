@@ -7,7 +7,6 @@
 
 # Config
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
-download_path=$(mktemp -d) # Create temporary download directory
 apps=(./apps/*.sh) # Build array of app updaters
 
 # Intro
@@ -137,22 +136,17 @@ prep_dmg_end() {
 
 # Downloads latest version of app and imports to Munki repo
 # Requires app_name (1), app_url (2) and app_path (3) as arguments
-update_app() {      
-    # Clear previous downloads
-    echo "Deleting old downloads..."
-    # Check download_path set (for saftey!!)
-    if [ -v $download_path ]; then
-        # Clear contents of download path
-        rm -rf "${download_path}"/*
-    fi
-    echo "" 
+update_app() {
+    # Create temporary download directory and store path
+    echo "Creating temporary download directory..."
+    download_path=$(mktemp -d)
 
     # Download latest release of app
     echo "Downloading latest release..."
     wget --trust-server-names "${2}" -P "${download_path}"
     echo "${1} downloaded."
     echo ""
-    
+
     # Get name of downloaded file
     file_name=$(echo "${download_path}"/*) 
     file_name=$(basename "${file_name}") # Remove path
@@ -224,17 +218,18 @@ do
     # Compare versions in Munki repo with the latest available online
     version_compare "${version}" "${avversion}"
     case "$?" in
-    "9") echo "Newer release available!"
-        update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}" ;;  # Run update process for the app
-        "10") echo "Munki repo matches online. Nothing to do." ;;
-        "11") echo "Munki repo has newer release. Nothing to do." ;;
+    "9") 
+        echo "Newer release available!"
+        update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}"  # Run update process for the app
+        echo "Removing temporary download directory..."
+        rm -rf "${download_path}" # Delete temporary directory
+        echo "Done!" && echo ""
+    ;;
+    "10") echo "Munki repo matches online. Nothing to do." ;;
+    "11") echo "Munki repo has newer release. Nothing to do." ;;
     *   ) echo "Something went wrong!";;
     esac
     echo "${app_name[$i]} is up to date!"
+    echo ""
 done
-echo ""
-echo "Removing temporary download directory..."
-rm -rf "${download_path}"
-echo "Done!"
-echo ""
 echo "All apps up to date! Exiting..."
