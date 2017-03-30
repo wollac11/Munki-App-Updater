@@ -5,7 +5,6 @@ down_url="https://download.mozilla.org/?product=firefox-esr-latest&os=osx&lang=e
 # Checks latest version of Firefox ESR available online
 check_avail_Firefox-ESR() {
         avversion=$(wget --spider -S --max-redirect 0 "https://download.mozilla.org/?product=firefox-esr-latest&os=osx&lang=en-GB" 2>&1 |  sed -n 's/^.*Firefox%20\([^&]*\)esr.dmg/\1/p;' | head -1)
-        echo "${avversion}" # output discovered version
 }
 
 # Edits Firefox ESR DMG to give make distinct from standard Firefox

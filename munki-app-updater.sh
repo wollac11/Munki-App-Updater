@@ -183,6 +183,7 @@ do
 	# Check version of app in Munki repo
 	echo "Checking existing ${app_name[$i]} version in repo..."
 	check_version "${munkirepo}pkgsinfo/${app_path[$i]}"
+	echo "${avversion}" # output discovered version
 	echo ""
 
 	# Verify update check function exists for app
