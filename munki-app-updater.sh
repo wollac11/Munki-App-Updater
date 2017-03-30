@@ -85,24 +85,24 @@ version_compare() {
 prep_dmg_start() {
 	# Make writable copy of DMG
 	echo "Making writeable image"
-	hdiutil convert "${download_path}"/"${1}"-ro.dmg -format UDRW -o "${download_path}"/"${1}"-rw.dmg
+	hdiutil convert "${download_path}"/"${1}" -format UDRW -o "${download_path}"/rw-"${1}"
 	echo ""
 
         # Increase size of image to allow for app rename
         echo "Calculating image size..."
-        local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+        local imgsize=`hdiutil resize -limits "${download_path}"/rw-"${1}" | tail -n1 | awk '{print $2}'`;
         echo "Image size is: ${imgsize}"
         echo "Growing writable image..."
         imgsize=$((imgsize + 100)) # Add 100 to DMG size
         echo "Resizing to: ${imgsize}"
-        hdiutil resize -sectors ${imgsize} "${download_path}"/"${1}"-rw.dmg
-        local imgsize=`hdiutil resize -limits "${download_path}"/"${1}"-rw.dmg | tail -n1 | awk '{print $2}'`;
+        hdiutil resize -sectors ${imgsize} "${download_path}"/rw-"${1}"
+        local imgsize=`hdiutil resize -limits "${download_path}"/rw-"${1}" | tail -n1 | awk '{print $2}'`;
         echo "New image size is: ${imgsize}"
         echo ""
 
         # Mount writable DMG to perform edit
         echo "Mounting image to edit..."
-        hdiutil attach "${download_path}"/"${1}"-rw.dmg
+        hdiutil attach "${download_path}"/rw-"${1}"
         echo ""
 }
 
@@ -115,22 +115,22 @@ prep_dmg_end() {
 
         # Compact image to previous size
         echo "Compacting image..."
-        hdiutil resize -sectors min "${download_path}"/"${1}"-rw.dmg
+        hdiutil resize -sectors min "${download_path}"/rw-"${1}"
         echo ""
 
         # Remove original downloaded image
         echo "Removing old Read-only image..."
-        rm -f "${download_path}"/"${1}"-ro.dmg
+        rm -f "${download_path}"/"${1}"
         echo ""
 
         # Make new read only image from modified rw DMG
         echo "Make new read-only image..."
-        hdiutil convert -format UDZO -o "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}"-rw.dmg
+        hdiutil convert -format UDZO -o "${download_path}"/"${1}" "${download_path}"/rw-"${1}"
         echo ""
 
         # Clear up writeable DMG
         echo "Removing unneeded writable-image..."
-        rm -f "${download_path}"/"${1}"-rw.dmg
+        rm -f "${download_path}"/rw-"${1}"
         echo "Firefox ESR DMG preparation finished!"
         echo ""
 }
@@ -147,30 +147,46 @@ update_app() {
   fi
 	echo ""	
 
-	# Download latest release of app
-	echo "Downloading newer release image..."
-	wget "${2}" -O "${download_path}"/"${1}"-ro.dmg
-	echo "${1} downloaded."
-	echo ""
+        # Get name of downloaded file
+        file_name=$(echo "${download_path}"/*) 
+        file_name=$(basename "${file_name}") # Remove path
+        
+        # Extract file extension from path
+        extension="${file_name##*.}"    
 
-	function_exists "prep_${1}"
-    	if [ "$?" = "0" ]; then
-		echo "${1} DMG needs modification!"
-		prep_"${1}" "${1}"
-	else
-                # No prep funcion, skip to import
-                echo "No prep function for app. Importing as is..."
-		echo ""
-	fi
-	
-	# Rename DMG to remove permissions suffix
-	echo "Renaming DMG to ${1}.dmg..."
-	mv "${download_path}"/"${1}"-ro.dmg "${download_path}"/"${1}".dmg
-	echo ""
+        # Check if prep function in app provider
+        function_exists "prep_${1}"
+        if [ "$?" = "0" ]; then
+                # Prep function found
+                echo "${1} needs modification!"
+                prep_"${1}" "${file_name}" # run app prep function
+        else
+                # No prep function found
+                # Check if file extension supported by import
+                if [[ " ${supported_ext[@]} " =~ " ${extension} " ]]; then
+                        # File extension supported
+                        echo "Found supported file extension '.${extension}'"
+                        # Skip to import
+                        echo "No prep function for app. Importing as is..." && echo ""
+                else
+                        # Unsupported file extension and no prep function to alter file
+                        # included in the app provider
+                        echo "File extension '.${extension}' not supported!"
+                        echo -n "Supported extensions are: "
+                        printf "'.%s' " "${supported_ext[@]}" && echo ""
+                        echo "" && echo "Cannot import app. Missing required prep function."
+                        return # Cancel app update
+                fi
+        fi
 
-	# Import app to Munki repo
-	echo "Starting Munki import..."
-	/usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${1}".dmg
+        # Make friendly filename
+        extension="${file_name##*.}"
+        mv "${download_path}/${file_name}" "${download_path}/${1}.${extension}"
+        file_name="${1}.${extension}"
+
+        # Import app to Munki repo
+        echo "Starting Munki import of ${file_name}..."
+        /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
 }
 
 # Checks existing versions of all apps in Munki repo and compare
