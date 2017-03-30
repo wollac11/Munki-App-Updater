@@ -205,7 +205,7 @@ do
 done
 echo ""
 echo "Removing temporary download directory..."
-rmdir "${download_path}"
+rm -rf "${download_path}"
 echo "Done!"
 echo ""
 echo "All apps up to date! Exiting..."
