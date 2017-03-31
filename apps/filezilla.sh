@@ -15,7 +15,7 @@ get_downurl() {
 }
 
 prep_FileZilla() {
-	tar xjvf "${download_path}/${1}" -C ${download_path}
+	tar xjf "${download_path}/${1}" -C ${download_path}
 	file_name="FileZilla.app"
 }
 
