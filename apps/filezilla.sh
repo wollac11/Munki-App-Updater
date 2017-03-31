@@ -11,12 +11,12 @@ check_avail_FileZilla() {
 
 get_downurl() {
 	check_avail_FileZilla
-	echo "https://download.filezilla-project.org/client/FileZilla_${avversion}_macosx-x86_setup_bundled.zip"
+	echo "https://downloads.sourceforge.net/project/filezilla/FileZilla_Client/${avversion}/FileZilla_${avversion}_macosx-x86.app.tar.bz2"
 }
 
 prep_FileZilla() {
-	unzip "${download_path}/${1}" -d ${download_path}
-	file_name="FileZilla-Installer.app"
+	tar xjvf "${download_path}/${1}" -C ${download_path}
+	file_name="FileZilla.app"
 }
 
 down_url=$(get_downurl)
