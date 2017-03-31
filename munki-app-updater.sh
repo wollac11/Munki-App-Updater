@@ -179,10 +179,13 @@ update_app() {
         fi
     fi
 
-    # Make friendly filename
-    extension="${file_name##*.}"
-    mv "${download_path}/${file_name}" "${download_path}/${1}.${extension}"
-    file_name="${1}.${extension}"
+    # Make friendly filename ([appname].[ext])
+    extension="${file_name##*.}" # recheck extension (in case of changes by prep)
+    if [ ! "${file_name}" == "${1}.${extension}" ]; then # check for incorrect name
+        echo "Renaming ${file_name} to ${1}.${extension}..."
+        mv "${download_path}/${file_name}" "${download_path}/${1}.${extension}" # rename file
+    fi
+    file_name="${1}.${extension}" # update stored file name
 
     # Import app to Munki repo
     echo "Starting Munki import of ${file_name}..."
