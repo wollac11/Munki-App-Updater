@@ -110,11 +110,13 @@ prep_dmg_start() {
 prep_dmg_end() {
     #  Unmount DMG 
     echo "Detaching image..."
+    sleep 2
     hdiutil detach /Volumes/Firefox
     echo ""
 
     # Compact image to previous size
     echo "Compacting image..."
+    sleep 2
     hdiutil resize -sectors min "${download_path}"/rw-"${1}"
     echo ""
 
