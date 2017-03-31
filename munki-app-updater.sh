@@ -8,6 +8,7 @@
 # Config
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
 apps=(./apps/*.sh) # Build array of app updaters
+supported_ext=('dmg' 'pkg' 'app') # array of supported file extensions
 
 # Intro
 clear
