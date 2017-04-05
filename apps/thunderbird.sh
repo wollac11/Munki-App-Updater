@@ -1,5 +1,5 @@
 munki_name="Thunderbird"
-munki_path="apps/thunderbird"
+munki_path="mozilla.org/Thunderbird"
 down_url="https://download.mozilla.org/?product=thunderbird-latest&os=osx&lang=en-GB"
 
 # Checks latest version of Thunderbird available online
