@@ -227,6 +227,11 @@ update_app() {
 
     # Report success
     echo "The munki package for "${1}" has been updated successfully!" && echo ""
+
+    # Delete temporary directory
+    echo "Removing temporary download directory..."
+    rm -rf "${download_path}"
+    echo "Done!" && echo ""
 }
 
 # Checks existing versions of all apps in Munki repo and compare
@@ -261,9 +266,6 @@ do
     "9") 
         echo "Newer release available!"
         update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}"  # Run update process for the app
-        echo "Removing temporary download directory..."
-        rm -rf "${download_path}" # Delete temporary directory
-        echo "Done!" && echo ""
     ;;
     "10") echo "Munki repo matches online. Nothing to do." ;;
     "11") echo "Munki repo has newer release. Nothing to do." ;;
