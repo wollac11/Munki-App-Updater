@@ -146,7 +146,7 @@ prep_dmg_start() {
     # Make writable copy of DMG
     echo "Making writeable image"
     hdiutil convert "${download_path}"/"${1}" -format UDRW -o "${download_path}"/rw-"${1}"
-    echo ""
+    echo
 
     # Increase size of image to allow for app rename
     echo "Calculating image size..."
@@ -158,12 +158,12 @@ prep_dmg_start() {
     hdiutil resize -sectors ${imgsize} "${download_path}"/rw-"${1}"
     local imgsize=`hdiutil resize -limits "${download_path}"/rw-"${1}" | tail -n1 | awk '{print $2}'`;
     echo "New image size is: ${imgsize}"
-    echo ""
+    echo
 
     # Mount writable DMG to perform edit
     echo "Mounting image to edit..."
     hdiutil attach "${download_path}"/rw-"${1}"
-    echo ""
+    echo
 }
 
 # Detaches DMG, compacts it and makes it read only
@@ -172,29 +172,29 @@ prep_dmg_end() {
     echo "Detaching image..."
     sleep 2
     hdiutil detach /Volumes/Firefox
-    echo ""
+    echo
 
     # Compact image to previous size
     echo "Compacting image..."
     sleep 2
     hdiutil resize -sectors min "${download_path}"/rw-"${1}"
-    echo ""
+    echo
 
     # Remove original downloaded image
     echo "Removing old Read-only image..."
     rm -f "${download_path}"/"${1}"
-    echo ""
+    echo
 
     # Make new read only image from modified rw DMG
     echo "Make new read-only image..."
     hdiutil convert -format UDZO -o "${download_path}"/"${1}" "${download_path}"/rw-"${1}"
-    echo ""
+    echo
 
     # Clear up writeable DMG
     echo "Removing unneeded writable-image..."
     rm -f "${download_path}"/rw-"${1}"
     echo "Firefox ESR DMG preparation finished!"
-    echo ""
+    echo
 }
 
 # Downloads latest version of app and imports to Munki repo
@@ -208,7 +208,7 @@ update_app() {
     echo "Downloading latest release..."
     wget --trust-server-names "${2}" -P "${download_path}"
     echo "${1} downloaded."
-    echo ""
+    echo
 
     # Get name of downloaded file
     file_name=$(echo "${download_path}"/*) 
@@ -230,14 +230,14 @@ update_app() {
             # File extension supported
             echo "Found supported file extension '.${extension}'"
             # Skip to import
-            echo "No prep function for app. Importing as is..." && echo ""
+            echo "No prep function for app. Importing as is..." && echo
         else
             # Unsupported file extension and no prep function to alter file
             # included in the app provider
             echo "File extension '.${extension}' not supported!"
             echo -n "Supported extensions are: "
-            printf "'.%s' " "${supported_ext[@]}" && echo ""
-            echo "" && echo "Cannot import app. Missing required prep function."
+            printf "'.%s' " "${supported_ext[@]}" && echo
+            echo && echo "Cannot import app. Missing required prep function."
             return # Cancel app update
         fi
     fi
@@ -264,12 +264,12 @@ update_app() {
     fi
 
     # Report success
-    echo "The munki package for "${1}" has been updated successfully!" && echo ""
+    echo "The munki package for "${1}" has been updated successfully!" && echo
 
     # Delete temporary directory
     echo "Removing temporary download directory..."
     rm -rf "${download_path}"
-    echo "Done!" && echo ""
+    echo "Done!" && echo
 }
 
 # Checks existing versions of all apps in Munki repo and compare
@@ -277,12 +277,12 @@ update_app() {
 # version is newer than that in the repo
 for ((i=0; i<${#app_name[*]}; i++));
 do
-    echo ""
+    echo
 
     # Check version of app in Munki repo
     echo "Checking existing ${app_name[$i]} version in repo..."
     check_version "${munkirepo}pkgsinfo/${app_path[$i]}"
-    echo ""
+    echo
 
     # Verify update check function exists for app
     function_exists "check_avail_${app_name[$i]// /_}"
@@ -296,7 +296,7 @@ do
     echo "Checking latest online version."
     check_avail_"${app_name[$i]// /_}"  # check latest available version online
     echo "${avversion}" # output discovered version
-    echo ""
+    echo
     
     # Compare versions in Munki repo with the latest available online
     version_compare "${version}" "${avversion}"
