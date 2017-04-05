@@ -9,6 +9,23 @@
 munkirepo="/net/mac-builder/var/www/html/munki_repo/"
 apps=(./apps/*.sh) # Build array of app updaters
 supported_ext=('dmg' 'pkg' 'app') # array of supported file extensions
+testing=false # default testing value
+
+# Proccess input arguments
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+
+    case $key in
+        -t|--test)
+            testing=true
+        ;;
+        *)
+                # unknown option
+        ;;
+    esac
+    shift # past argument or value
+done
 
 # Intro
 clear
@@ -17,7 +34,12 @@ echo "---MUNKI APP UPDATER---"
 echo "------Version 1.1------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
-echo ""
+echo
+
+if [ $testing = true ]; then
+    echo "RUNNING IN TESTING MODE" && echo
+fi
+
 echo "Apps to update:"
 
 # Iterate through apps array using a counter
@@ -190,9 +212,18 @@ update_app() {
     fi
     file_name="${1}.${extension}" # update stored file name
 
-    # Import app to Munki repo
-    echo "Starting Munki import of ${file_name}..."
-    /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
+    # Check testing mode is off
+    if [ $testing = false ]; then
+        # Import app to Munki repo
+        echo "Starting Munki import of ${file_name}..."
+        /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
+
+        # Report success
+        echo "The munki package for "${1}" has been updated successfully!" && echo
+    else 
+        # Testing mode on, skip import
+        echo "Testing mode active! Skipping import..."
+    fi
 
     # Report success
     echo "The munki package for "${1}" has been updated successfully!" && echo ""
