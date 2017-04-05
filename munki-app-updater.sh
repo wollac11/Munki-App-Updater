@@ -17,6 +17,14 @@ do
     key="$1"
 
     case $key in
+        -e|--exclude)
+            app_exclude+=("$2")
+            shift # past argument
+        ;;
+        -a|--app)
+            app_only+=("$2")
+            shift # past argument
+        ;;
         -t|--test)
             testing=true
         ;;
@@ -45,9 +53,33 @@ echo "Apps to update:"
 # Iterate through apps array and proccess them
 # for inclusion/exclusion in updates
 for app in "${apps[@]}"; do
+    # Get app munki name
+    c_app_name=$(grep "munki_name" "${app}" | sed -e 's/munki_name="\(.*\)"/\1/')
+
+    # Disable case matching
+    shopt -s nocasematch
+
+    # Check if current app exists in excluded array
+    if [[ " ${app_exclude[@]} " =~ " ${c_app_name} " ]]; then
+        skipped_apps+=("${c_app_name}") # Record app skipped with 'clean' name
+        continue # skip to next app
+    fi
+
+    # Check if single app mode is specified
+    if [ $app_only ]; then
+        # Check if current app is not the specified app
+        if [[ ! " ${app_only[@]} " =~ " ${c_app_name} " ]]; then
+            skipped_apps+=("${c_app_name}") # Record app skipped with 'clean' name
+            continue # skip to next app
+        fi
+    fi
+
+    # Re-enable case matching
+    shopt -u nocasematch 
+
     # Include current app updater script
     source "${app}"
-    
+
     # Output app name
     echo "${munki_name}"
 
@@ -56,6 +88,11 @@ for app in "${apps[@]}"; do
     app_path+=("${munki_path}")
     app_url+=("${down_url}")
 done
+
+if [ $skipped_apps ]; then
+    echo && echo "Excluded apps:"
+    printf '%s\n' "${skipped_apps[@]}"
+fi
 
 # Checks if a given function exists
 function_exists() {
