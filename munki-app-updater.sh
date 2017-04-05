@@ -42,18 +42,19 @@ fi
 
 echo "Apps to update:"
 
-# Iterate through apps array using a counter
-for ((i=0; i<${#apps[@]}; i++)); do
+# Iterate through apps array and proccess them
+# for inclusion/exclusion in updates
+for app in "${apps[@]}"; do
     # Include current app updater script
-    source "${apps[$i]}"
+    source "${app}"
     
     # Output app name
     echo "${munki_name}"
 
     # Build arrays of app properties
-    app_name[i]="${munki_name}"
-    app_path[i]="${munki_path}"
-    app_url[i]="${down_url}"
+    app_name+=("${munki_name}")
+    app_path+=("${munki_path}")
+    app_url+=("${down_url}")
 done
 
 # Checks if a given function exists
