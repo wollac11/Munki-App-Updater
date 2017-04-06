@@ -1,7 +1,7 @@
 # Munki App Updater
 Checks &amp; updates Munki packaged apps for managed OSX machines
 
-Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop
+Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop, FileZilla
 
 <details> 
 	<summary>
@@ -67,5 +67,21 @@ Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop
 			- Added: support for Munki pkginfo files with a .plist extension  
 			- Added: provider for updating Mendeley Desktop  
 			- Misc code improvements
+
+		-- 1.2 (06/06/2017):
+
+			- Added: Use of temp directories for downloads
+			- Added: Provider for FileZilla
+			- Added: Excluding of apps by input argument
+			- Added: Updating specific apps by input argument
+			- Added: Testing mode
+			- Added: Cleanup of download files after import
+			- Added: Support for non DMG app packages
+			- Fixed: Redundant code (removed)
+			- Fixed: Thunderbird app path (updated to match Autopkg recipe)
+			- Fixed: Completion messages (now conditional on success)
+			- Fixed: Resource busy errors from diskutil on slow volumes
+			- Fixed: File permissions on app providers
+			- Fixed: Misc small bugs
 
 </details>

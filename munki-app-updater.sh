@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 1.1
+# Version 1.2
 # Charlie Callow 2017
 
 # Config
@@ -39,7 +39,7 @@ done
 clear
 echo "-----------------------"
 echo "---MUNKI APP UPDATER---"
-echo "------Version 1.1------"
+echo "------Version 1.2------"
 echo "--Charlie Callow 2017--"
 echo "-----------------------"
 echo
