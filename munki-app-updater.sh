@@ -167,11 +167,12 @@ prep_dmg_start() {
 }
 
 # Detaches DMG, compacts it and makes it read only
+# Takes file name (1) and volume path (2) as arguments
 prep_dmg_end() {
     #  Unmount DMG 
     echo "Detaching image..."
     sleep 2
-    hdiutil detach /Volumes/Firefox
+    hdiutil detach "${2}"
     echo
 
     # Compact image to previous size
@@ -193,7 +194,7 @@ prep_dmg_end() {
     # Clear up writeable DMG
     echo "Removing unneeded writable-image..."
     rm -f "${download_path}"/rw-"${1}"
-    echo "Firefox ESR DMG preparation finished!"
+    echo "DMG preparation finished!"
     echo
 }
 

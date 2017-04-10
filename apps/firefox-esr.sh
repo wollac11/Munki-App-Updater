@@ -17,12 +17,15 @@ prep_Firefox-ESR() {
     # Make & mount writable image for edits
     prep_dmg_start "${1}"
 
+    # Set volume path
+    app_vol="/Volumes/Firefox"
+
     # Rename Firefox app
     echo "Renaming Firefox.app to Firefox-ESR.app"
-    mv /Volumes/Firefox/Firefox.app /Volumes/Firefox/Firefox-ESR.app
+    mv "${app_vol}/Firefox.app" "${app_vol}/Firefox-ESR.app"
     echo ""
 
     # Detach DMG and make read only
-    prep_dmg_end "${1}"
+    prep_dmg_end "${1}" "${app_vol}"
 }
 
