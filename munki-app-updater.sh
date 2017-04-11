@@ -17,7 +17,17 @@ print_help() {
     echo "-a | --app [appname]      : Update specific package only (white-list mode)"
     echo "-e | --exclude [appname]  : Exclude a package from being updated (black-list mode)"
     echo "-h | --help               : See available options and arguments"
+    echo "-i | --about              : View version info"
     echo "-t | --test               : Enable testing mode"
+}
+
+# Prints version information
+print_info() {
+    echo "-----------------------"
+    echo "---MUNKI APP UPDATER---"
+    echo "------Version 1.2------"
+    echo "--Charlie Callow 2017--"
+    echo "-----------------------"
 }
 
 # Proccess input arguments
@@ -28,6 +38,10 @@ do
     case $key in
         -h|--help)
             print_help
+            exit
+        ;;
+        -i|--about)
+            print_info
             exit
         ;;
         -e|--exclude)
@@ -49,13 +63,7 @@ do
 done
 
 # Intro
-clear
-echo "-----------------------"
-echo "---MUNKI APP UPDATER---"
-echo "------Version 1.2------"
-echo "--Charlie Callow 2017--"
-echo "-----------------------"
-echo
+clear && print_info && echo
 
 if [ $testing = true ]; then
     echo "RUNNING IN TESTING MODE" && echo
