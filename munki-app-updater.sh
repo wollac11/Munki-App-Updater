@@ -260,7 +260,7 @@ update_app() {
             echo -n "Supported extensions are: "
             printf "'.%s' " "${supported_ext[@]}" && echo
             echo && echo "Cannot import app. Missing required prep function."
-            return # Cancel app update
+            return 3 # Cancel app update and return error
         fi
     fi
 
@@ -277,16 +277,10 @@ update_app() {
         # Import app to Munki repo
         echo "Starting Munki import of ${file_name}..."
         /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
-
-        # Report success
-        echo "The munki package for "${1}" has been updated successfully!" && echo
     else 
         # Testing mode on, skip import
         echo "Testing mode active! Skipping import..."
     fi
-
-    # Report success
-    echo "The munki package for "${1}" has been updated successfully!" && echo
 
     # Delete temporary directory
     echo "Removing temporary download directory..."
@@ -326,10 +320,45 @@ do
     "9") 
         echo "Newer release available!"
         update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}"  # Run update process for the app
+
+        if [ $? == "0" ]; then
+            # Report success
+            echo "The munki package for "${app_name[$i]}" has been updated successfully!"
+            successes+=("${app_name[$i]}") # record success
+        else
+            # Report failure
+            echo "Error: The munki package for "${app_name[$i]}" could not be updated!"
+            failures+=("${app_name[$i]}") # record failure
+        fi
     ;;
-    "10") echo "Munki repo matches online. Nothing to do." ;;
-    "11") echo "Munki repo has newer release. Nothing to do." ;;
+    "10")
+        echo "Munki repo matches online. Nothing to do."
+        already_update+=("${app_name[$i]}") # record already up to date
+    ;;
+    "11")
+        echo "Munki repo has newer release. Nothing to do."
+        already_update+=("${app_name[$i]}") # record already up to date
+    ;;
     *   ) echo "Something went wrong!";;
     esac
 done
-echo "All apps up to date! Exiting..."
+
+# If any, report any packages updated
+if [ $successes ]; then
+    echo && echo "Packages updated:"
+    printf '%s\n' "${successes[@]}"
+fi
+
+# If any, report any packages already up to date
+if [ $already_update ]; then
+    echo && echo "Packages already up to date:"
+    printf '%s\n' "${already_update[@]}"
+fi
+
+# If any, report any packages which failed to update
+if [ $failures ]; then
+    echo && echo "Packages failed to update:"
+    printf '%s\n' "${failures[@]}"
+fi
+
+echo && echo "Exiting..."
