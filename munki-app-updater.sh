@@ -355,6 +355,8 @@ done
 if [ $successes ]; then
     echo && echo "Packages updated:"
     printf '%s\n' "${successes[@]}"
+else
+    echo && echo "No packages were updated."
 fi
 
 # If any, report any packages already up to date
