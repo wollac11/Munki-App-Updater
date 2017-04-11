@@ -11,12 +11,25 @@ apps=(./apps/*.sh) # Build array of app updaters
 supported_ext=('dmg' 'pkg' 'app') # array of supported file extensions
 testing=false # default testing value
 
+# Prints supported input options and arguments
+print_help() {
+    echo && echo "Options and arguments:"
+    echo "-a | --app [appname]      : Update specific package only (white-list mode)"
+    echo "-e | --exclude [appname]  : Exclude a package from being updated (black-list mode)"
+    echo "-h | --help               : See available options and arguments"
+    echo "-t | --test               : Enable testing mode"
+}
+
 # Proccess input arguments
 while [[ $# -gt 0 ]]
 do
     key="$1"
 
     case $key in
+        -h|--help)
+            print_help
+            exit
+        ;;
         -e|--exclude)
             app_exclude+=("$2")
             shift # past argument
