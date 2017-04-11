@@ -219,6 +219,13 @@ prep_dmg_end() {
     echo
 }
 
+# Deletes temporary directory
+delete_temp() {
+    echo "Removing temporary download directory..."
+    rm -rf "${download_path}"
+    echo "Done!" && echo
+}
+
 # Downloads latest version of app and imports to Munki repo
 # Requires app_name (1), app_url (2) and app_path (3) as arguments
 update_app() {
@@ -282,10 +289,8 @@ update_app() {
         echo "Testing mode active! Skipping import..."
     fi
 
-    # Delete temporary directory
-    echo "Removing temporary download directory..."
-    rm -rf "${download_path}"
-    echo "Done!" && echo
+    # Delete temp directory
+    delete_temp
 }
 
 # Checks existing versions of all apps in Munki repo and compare
@@ -326,6 +331,9 @@ do
             echo "The munki package for "${app_name[$i]}" has been updated successfully!"
             successes+=("${app_name[$i]}") # record success
         else
+            # Delete temp directory
+            delete_temp
+
             # Report failure
             echo "Error: The munki package for "${app_name[$i]}" could not be updated!"
             failures+=("${app_name[$i]}") # record failure
