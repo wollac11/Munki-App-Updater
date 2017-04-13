@@ -11,6 +11,22 @@ apps=(./apps/*.sh) # Build array of app updaters
 supported_ext=('dmg' 'pkg' 'app') # array of supported file extensions
 testing=false # default testing value
 
+# Text colour & formatting variables
+txtund=$(tput sgr 0 1)      # underline
+txtbld=$(tput bold)         # bold
+txtred=$(tput setaf 1)      # red
+txtgrn=$(tput setaf 2)      # green
+txtorg=$(tput setaf 3)      # orange
+txtblu=$(tput setaf 4)      # blue
+txtppl=$(tput setaf 5)      # pink/purple
+undred=${txtund}${txtred}   # red underline
+undgrn=${txtund}${txtgrn}   # green underline
+undorg=${txtund}${txtorg}   # orange underline
+undblu=${txtund}${txtblu}   # blue underline
+bldred=${txtbld}${txtred}   # red bold
+bldppl=${txtbld}${txtppl}   # purple bold
+txtrst=$(tput sgr0)         # reset
+
 # Prints supported input options and arguments
 print_help() {
     echo && echo "Options and arguments:"
@@ -66,10 +82,10 @@ done
 clear && print_info && echo
 
 if [ $testing = true ]; then
-    echo "RUNNING IN TESTING MODE" && echo
+    echo "${bldppl}RUNNING IN TESTING MODE${txtrst}" && echo
 fi
 
-echo "Apps to update:"
+echo "${undblu}Apps to update:${txtrst}"
 
 # Iterate through apps array and proccess them
 # for inclusion/exclusion in updates
@@ -102,7 +118,7 @@ for app in "${apps[@]}"; do
     source "${app}"
 
     # Output app name
-    echo "${munki_name}"
+    echo " - ${munki_name}"
 
     # Build arrays of app properties
     app_name+=("${munki_name}")
@@ -111,8 +127,8 @@ for app in "${apps[@]}"; do
 done
 
 if [ $skipped_apps ]; then
-    echo && echo "Excluded apps:"
-    printf '%s\n' "${skipped_apps[@]}"
+    echo && echo "${undorg}Excluded apps:${txtrst}"
+    printf ' - %s\n' "${skipped_apps[@]}"
 fi
 
 # Checks if a given function exists
@@ -234,9 +250,9 @@ update_app() {
     download_path=$(mktemp -d)
 
     # Download latest release of app
-    echo "Downloading latest release..."
+    echo && echo "Downloading latest release..."
     wget --trust-server-names "${2}" -P "${download_path}"
-    echo "${1} downloaded."
+    echo "${txtbld}${1} downloaded.${txtrst}"
     echo
 
     # Get name of downloaded file
@@ -263,11 +279,11 @@ update_app() {
         else
             # Unsupported file extension and no prep function to alter file
             # included in the app provider
-            echo "File extension '.${extension}' not supported!"
-            echo -n "Supported extensions are: "
-            printf "'.%s' " "${supported_ext[@]}" && echo
-            echo && echo "Cannot import app. Missing required prep function."
-            return 3 # Cancel app update and return error
+            echo "${bldred}File extension '.${extension}' not supported!${txtrst}"
+            echo -n "${txtblu}Supported extensions are: "
+            printf "'.%s' " "${supported_ext[@]}" && echo "${txtrst}"
+            echo && echo "${bldred}Cannot import app. Missing required prep function."
+            echo "${txtrst}" && return 3 # Cancel app update and return error
         fi
     fi
 
@@ -286,7 +302,8 @@ update_app() {
         /usr/local/munki/munkiimport --subdirectory="${3}" "${download_path}"/"${file_name}"
     else 
         # Testing mode on, skip import
-        echo "Testing mode active! Skipping import..."
+        echo "${bldppl}" && echo "Testing mode active! Skipping import...${txtrst}"
+        echo
     fi
 
     # Delete temp directory
@@ -309,7 +326,7 @@ do
     function_exists "check_avail_${app_name[$i]// /_}"
     if [ "$?" != "0" ]; then
         # No update checking function, skip to next app
-        echo "Error: No update check function for app!"
+        echo "${bldred}Error: No update check function for app!${txtrst}"
         echo "Skipping online update check for ${app_name[$i]}."
         continue
     fi
@@ -323,7 +340,7 @@ do
     version_compare "${version}" "${avversion}"
     case "$?" in
     "9") 
-        echo "Newer release available!"
+        echo "${txtbld}Newer release available!${txtrst}" && echo
         update_app "${app_name[$i]}" "${app_url[$i]}" "${app_path[$i]}"  # Run update process for the app
 
         if [ $? == "0" ]; then
@@ -335,7 +352,7 @@ do
             delete_temp
 
             # Report failure
-            echo "Error: The munki package for "${app_name[$i]}" could not be updated!"
+            echo "${bldred}Error: The munki package for "${app_name[$i]}" could not be updated!${txtrst}"
             failures+=("${app_name[$i]}") # record failure
         fi
     ;;
@@ -347,28 +364,37 @@ do
         echo "Munki repo has newer release. Nothing to do."
         already_update+=("${app_name[$i]}") # record already up to date
     ;;
-    *   ) echo "Something went wrong!";;
+    *   ) echo "${bldred}Something went wrong!${txtrst}";;
     esac
 done
 
+echo && echo "-----------------------"
+echo "----${txtbld}RESULT SUMMARY${txtrst}:----"
+echo "-----------------------" && echo
+
 # If any, report any packages updated
 if [ $successes ]; then
-    echo && echo "Packages updated:"
-    printf '%s\n' "${successes[@]}"
+    echo "${undgrn}Packages updated:${txtrst}${txtgrn}"
+    printf ' - %s\n' "${successes[@]}"
+    echo "${txtrst}"
 else
-    echo && echo "No packages were updated."
+    echo && echo "${txtbld}No packages were updated!${txtrst}"
 fi
 
 # If any, report any packages already up to date
 if [ $already_update ]; then
-    echo && echo "Packages already up to date:"
-    printf '%s\n' "${already_update[@]}"
+    echo "${undorg}Packages already up to date:${txtrst}${txtorg}"
+    printf ' - %s\n' "${already_update[@]}"
+    echo "${txtrst}"
 fi
 
 # If any, report any packages which failed to update
 if [ $failures ]; then
-    echo && echo "Packages failed to update:"
-    printf '%s\n' "${failures[@]}"
+    echo "${undred}Packages failed to update:${txtrst}${txtred}"
+    printf ' - %s\n' "${failures[@]}"
+    echo "${txtrst}"
 fi
+
+echo "-----------------------"
 
 echo && echo "Exiting..."
