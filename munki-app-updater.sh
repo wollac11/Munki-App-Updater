@@ -141,7 +141,7 @@ function_exists() {
 check_version() {
     # Create an array of .pkginfo files in app directory
     # (ordered by ascending modification time)
-    for dir in $(ls -tr $1/*.p*); do
+    for dir in $(ls -tr $1/*.p* 2>/dev/null); do
             files=($dir)
     done
 
@@ -150,7 +150,6 @@ check_version() {
     version="${version//[!0-9.]/}"  # remove non-decimal characters
     version="${version#.}" # remove preceding "."
     version="${version%.}" # remove following "."
-    echo "${version}"       # output version 
 }
 
 # Compares two version strings, returns 10 if they are equal, 9 if
@@ -320,6 +319,18 @@ do
     # Check version of app in Munki repo
     echo "Checking existing ${app_name[$i]} version in repo..."
     check_version "${munkirepo}/pkgsinfo/${app_path[$i]}"
+
+    # Verify check_version found pkginfo file in repo
+    if [ ! ${version} == "" ]; then
+        # All well, report and continue
+        echo "${version}"       # output version
+    else
+        # No files found in app path, report error
+        echo "${bldred}Error: No pkginfo found in app path!${txtrst}"
+        failures+=("${app_name[$i]}") # record failure
+        continue    # skip to next app
+    fi
+
     echo
 
     # Verify update check function exists for app
