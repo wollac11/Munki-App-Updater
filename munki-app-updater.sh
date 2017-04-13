@@ -378,7 +378,7 @@ if [ $successes ]; then
     printf ' - %s\n' "${successes[@]}"
     echo "${txtrst}"
 else
-    echo && echo "${txtbld}No packages were updated!${txtrst}"
+    echo "${txtbld}No packages were updated!${txtrst}" && echo
 fi
 
 # If any, report any packages already up to date
