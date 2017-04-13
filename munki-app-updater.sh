@@ -6,7 +6,7 @@
 # Charlie Callow 2017
 
 # Config
-munkirepo="/net/mac-builder/var/www/html/munki_repo/"
+munkirepo="/net/mac-builder/var/www/html/munki_repo"
 apps=(./apps/*.sh) # Build array of app updaters
 supported_ext=('dmg' 'pkg' 'app') # array of supported file extensions
 testing=false # default testing value
@@ -319,7 +319,7 @@ do
 
     # Check version of app in Munki repo
     echo "Checking existing ${app_name[$i]} version in repo..."
-    check_version "${munkirepo}pkgsinfo/${app_path[$i]}"
+    check_version "${munkirepo}/pkgsinfo/${app_path[$i]}"
     echo
 
     # Verify update check function exists for app
