@@ -84,4 +84,17 @@ Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop, FileZilla
 			- Fixed: File permissions on app providers
 			- Fixed: Misc small bugs
 
+		-- 1.3 (19/04/2017):
+
+			- Added: Handling of missing pkginfo files
+			- Added: Colours & formatting to output messages
+			- Added: Result summary at end of execution
+			- Added: Improved error capture and recording
+			- Added: About startup option (-i | --about)
+			- Added: Usage help option (-h | --help)
+			- Fixed: Firefox-ESR specific references in main (removed)
+			- Fixed: Success messages shown even following error
+			- Fixed: Temporary directories not removed following error
+			- Fixed: Message spacing (improved for clarity)
+
 </details>
