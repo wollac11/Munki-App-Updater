@@ -2,7 +2,7 @@
 
 # Munki App Updater
 # Checks and updates munki packages
-# Version 1.2
+# Version 1.3
 # Charlie Callow 2017
 
 # Config
@@ -41,7 +41,7 @@ print_help() {
 print_info() {
     echo "-----------------------"
     echo "---MUNKI APP UPDATER---"
-    echo "------Version 1.2------"
+    echo "------Version 1.3------"
     echo "--Charlie Callow 2017--"
     echo "-----------------------"
 }
