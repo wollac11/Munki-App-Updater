@@ -68,7 +68,7 @@ Supported apps: Firefox, Firefox ESR, Thunderbird, Mendeley Desktop, FileZilla
 			- Added: provider for updating Mendeley Desktop  
 			- Misc code improvements
 
-		-- 1.2 (06/06/2017):
+		-- 1.2 (06/04/2017):
 
 			- Added: Use of temp directories for downloads
 			- Added: Provider for FileZilla
